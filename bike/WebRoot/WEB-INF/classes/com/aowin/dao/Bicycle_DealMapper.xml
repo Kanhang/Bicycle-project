@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aowin.dao.Bicycle_DealMapper">
+	<insert id="insertBicycle_Deal" parameterType="com.aowin.model.Bicycle_Deal"
+		statementType="PREPARED">
+
+		insert into bicycle_deal
+		(create_time,deal_name,deal_type,record_id,card_id
+		,is_fee,chg_money,fee_type,bicycle_id,pile_id,user_id)
+		values(#{create_time},#{deal_name},#{deal_type},#{record_id},#{card_id},#{is_fee},#{chg_money}
+		,#{fee_type},#{bicycle_id},#{pile_id},#{user_id})
+
+	</insert>
+</mapper>

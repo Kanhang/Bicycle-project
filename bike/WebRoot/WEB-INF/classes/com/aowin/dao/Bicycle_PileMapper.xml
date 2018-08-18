@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aowin.dao.Bicycle_PileMapper">
+	<select id="searchPile" parameterType="com.aowin.model.Bicycle_Pile"
+		resultType="com.aowin.model.Bicycle_Pile">
+		select * from bicycle_pile where pile_code=#{pile_code}
+	</select>
+
+<update id="emigrateBicycle_Pile" parameterType="com.aowin.model.Bicycle_Pile"
+      statementType="PREPARED">
+      
+     update bicycle_pile set  status=2,bicycle_id=null, remark='无车' where pile_code=#{pile_code}
+      
+      </update>
+
+<update id="immigrateBicycle_Pile" parameterType="com.aowin.model.Bicycle_Pile"
+statementType="PREPARED">
+update bicycle_pile set status=1, bicycle_id=#{bicycle_id}, remark='有车' where pile_id=#{pile_id}
+
+</update>
+<select id="selectCount" parameterType="java.util.Map" resultType="int">
+select 
+   count(*)
+   from Bicycle_Pile
+   where  pile_id  &gt;= 0
+   and station_id=#{station_id}
+   </select>
+   <select id="selectData" parameterType="java.util.Map" resultType="com.aowin.model.Bicycle_Pile">
+   select * from 
+   (select  status,pile_code, station_id, bicycle_id, remark ,rownum r
+   from  <!-- rownum 是oracle关键字必须取一个别名才可以使用，不然会报错 -->
+      bicycle_pile
+       where 
+   pile_id  &gt;= 0
+    and station_id=#{station_id}
+  
+       and rownum &lt;= #{endNo})t 
+      where t.r >= #{startNo}
+  </select> 
+</mapper>

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.aowin.dao.CardMapper">
+<select id="searchCard" parameterType="com.aowin.model.Card" resultType="com.aowin.model.Card">
+select * from card where card_code=#{card_code} 
+</select>
+<insert id="insertCard" parameterType="com.aowin.model.Card" statementType="PREPARED">
+insert into card(card_code,card_type,name,idcard,sex,telphone,mobile,email,address,work,zxbj,monthly_money,frozen_money,wallet_money,status)
+ values (#{card_code},#{card_type},#{name},#{idcard},#{sex},#{telphone},#{mobile},#{email},#{address},#{work},#{ZXBJ},#{monthly_money},#{frozen_money},#{wallet_money},#{status})
+</insert> 
+<update id="updateCard" parameterType="com.aowin.model.Card" statementType="PREPARED">
+update card set
+card_type=#{card_type},name=#{name},idcard=#{idcard},sex=#{sex},telphone=#{telphone},mobile=#{mobile},email=#{email},address=#{address},work=#{work},zxbj=#{ZXBJ},status=#{status} 
+where card_code=#{card_code}
+</update>
+<update id="lossCard" parameterType="com.aowin.model.Card" statementType="PREPARED">
+update card set 
+status=2 
+where card_code=#{card_code} 
+</update>
+<update id="recharge_wallet" parameterType="com.aowin.model.Card" statementType="PREPARED">
+update card set
+wallet_money=#{wallet_money}
+where card_code=#{card_code}
+</update>
+<update id="recharge_monthly" parameterType="com.aowin.model.Card" statementType="PREPARED">
+update card set
+monthly_money=#{monthly_money}
+where card_code=#{card_code}
+</update>
+<update id ="logOffCard" parameterType="com.aowin.model.Card" statementType="PREPARED">
+update card set
+zxbj=1,monthly_money=0.0,frozen_money=0.0, wallet_money=0.0
+where card_code=#{card_code}
+</update>
+<select id="selectCount" parameterType="java.util.Map" resultType="int">
+select 
+   count(*)
+   from card 
+   where  card_id  &gt;= 0
+   <include refid="queryCondition"/>
+   </select>
+   <select id="selectData" parameterType="java.util.Map" resultType="com.aowin.model.Card">
+   select * from 
+   (select card_id,card_code,card_type,name,idcard,sex,
+   telphone,mobile,email,address,work,zxbj,monthly_money,frozen_money,wallet_money,status,rownum r
+   from  <!-- rownum 是oracle关键字必须取一个别名才可以使用，不然会报错 -->
+       card
+       where 
+       card_id  &gt;= 0
+       <include refid="queryCondition"/>
+       and rownum &lt;= #{endNo})t 
+      where t.r >= #{startNo}
+  </select> 
+<sql id="queryCondition">
+<if test ="card_code != null and card_code!=''">
+           and card_code like '%'||#{card_code}||'%'
+ </if>
+ <if test ="card_type != null and card_type!=''">
+           and card_type like '%'||#{card_type}||'%'
+ </if>
+ <if test="name != null and name!=''">
+           and name like '%'||#{name}||'%'
+ </if>
+
+  <if test="sex != null and sex!=''">
+           and sex like '%'||#{sex}||'%'
+ </if>
+ 
+
+</sql>
+</mapper> 

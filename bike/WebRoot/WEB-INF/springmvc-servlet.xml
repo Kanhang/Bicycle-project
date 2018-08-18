@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+		xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/mvc
+        http://www.springframework.org/schema/mvc/spring-mvc.xsd
+          http://www.springframework.org/schema/tx
+            http://www.springframework.org/schema/tx/spring-tx.xsd"
+    >
+    <!-- 第一步:创建mapper对象 -->
+	<!-- 1.1 创建数据源 对象 DataSource -->
+	<!-- 导入资源文件 -->
+	<context:property-placeholder location="classpath:jdbc.properties"/>
+	<!-- 
+		DataSource是一个接口 提供了数据源的接口规范 javax.sql.DataSource
+		此处使用的数据源对象为dbcp的数据源
+		如果使用其他的数据源对象 只需要改动class的类型和对应的属性名称即可
+		数据源有很多种类的：
+		常用 apache dbcp
+		c3p0
+		proxool
+	 -->
+	 <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
+		<property name="driverClassName" value="${driver_}"></property>
+		<property name="url" value="${url_}"></property>
+		<property name="username" value="${username_}"></property>
+		<property name="password" value="${password_}"></property>
+		<property name="maxActive" value="${maxActive_}"></property>
+		<property name="minIdle" value="${minIdle_}"></property>
+		<property name="maxIdle" value="${maxIdle_}"></property>
+		<property name="maxWait" value="${maxWait_}"></property>
+	</bean>
+	
+	<!-- 1.2 使用1.1创建的DataSouce创建SqlSessionFactory对象 -->
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource"></property>
+	
+	</bean>
+	<!-- 1.3 使用1.2的对象创建mapper 
+		ioc容器自动将指定包下的mapper对象都创建出来 创建的mapper的id为类名首字母小写
+	-->
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="basePackage" value="com.aowin.dao"></property>
+	</bean>
+		<!-- 第二步 创建service -->
+	<bean id="cardServiceImpl" class="com.aowin.service.impl.CardServiceImpl">
+		<property name="cardMapper" ref="cardMapper"></property> <!-- 类名首字母小写 -->
+		<property name="card_RecordMapper" ref="card_RecordMapper"></property>
+			<property name="card_Info_RecordMapper" ref="card_Info_RecordMapper"></property>
+	</bean>
+	
+<bean id="bicycleServiceImpl" class="com.aowin.service.impl.BicycleServiceImpl">
+<property name="bicycle_DealMapper" ref="bicycle_DealMapper"></property>
+<property name="bicycle_DeployMapper" ref="bicycle_DeployMapper"></property>
+<property name="bicycle_InfoMapper" ref="bicycle_InfoMapper"></property>
+<property name="bicycle_PileMapper" ref="bicycle_PileMapper"></property>
+<property name="bicycle_StationMapper" ref="bicycle_StationMapper"></property>
+<property name="bicycle_RecordMapper" ref="bicycle_RecordMapper"></property>
+
+</bean>
+<bean id="statServiceImpl" class="com.aowin.service.impl.StatServiceImpl">
+<property name="bicycle_DataMapper" ref="bicycle_DataMapper"></property>
+</bean>
+    	<!-- 配置一个控制器对象 该控制器的访问路径为/hello 
+		name - 访问路径
+		这个配置使用了BeanNameUrlHandlerMapping来处理请求和controller对象的映射
+		SimpleControllerHandlerAdapter来调用controller的方法
+	--><context:component-scan base-package="com.aowin.controller"></context:component-scan>
+	   <context:component-scan base-package="com.aowin.service"></context:component-scan>
+	    <mvc:annotation-driven validator="validator"></mvc:annotation-driven>
+		<bean id="validator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean">
+		<property name="providerClass" value="org.hibernate.validator.HibernateValidator"></property>
+	</bean>
+			<!-- 第四步 添加事务处理 -->
+	<!-- 4.1 创建事务处理的对象 -->
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<!-- 设置管理的数据源对象 -->
+		<property name="dataSource" ref="dataSource"></property>
+	</bean>
+	
+	<!-- 4.2 创建事务处理的拦截器 (围绕通知)-->
+	<bean id="transactionInterceptor" class="org.springframework.transaction.interceptor.TransactionInterceptor">
+		<property name="transactionManager" ref="transactionManager"></property>
+		<!-- 设置事务的属性
+			属性中包含方法名称和事务的传播 行为
+			
+			key - 对应要添加事务的方法名称 可以写完整的方法 也可以使用正确写
+			
+			传播行为定义在TransactionDefinition接口中
+			
+			1.PROPAGATION_REQUIRED 支持当前的事务，如果当前不存在事务则创建新的事务
+			2.PROPAGATION_SUPPORTS 支持当前的事务，如果当前不存在事务，则以非事务运行
+			3.PROPAGATION_MANDATORY 支持当前的事务，如果不存在事务中，则抛出异常
+			4.PROPAGATION_REQUIRES_NEW 创建新的事务，如果当前方法存在事务，则以子事务运行
+			5.PROPAGATION_NOT_SUPPORTED 不支持事务 始终以非事务状态运行
+			6.PROPAGATION_NEVER 不支持事务 如果处于事务中 则抛出异常
+			7.PROPAGATION_NESTED 嵌套事务
+			
+		 -->
+		<property name="transactionAttributes">
+			<props>
+			
+				<prop key="register">PROPAGATION_REQUIRED</prop>
+			</props>
+		</property>
+	</bean>
+	
+	<!-- 4.3创建代理对象 -->
+	<bean class="org.springframework.aop.framework.autoproxy.BeanNameAutoProxyCreator">
+		<property name="beanNames">
+			<array>
+				<value>*Service</value>
+			</array>
+		</property>
+		<property name="interceptorNames" value="transactionInterceptor"></property>
+	</bean>
+	<tx:annotation-driven transaction-manager="transactionManager"/>
+	
+    </beans>

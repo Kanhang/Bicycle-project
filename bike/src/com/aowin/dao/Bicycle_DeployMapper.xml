@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aowin.dao.Bicycle_DeployMapper">
+<insert id="insertBicycle_Deploy" statementType="PREPARED" parameterType="com.aowin.model.Bicycle_Deploy">
+insert into bicycle_deploy (bicycle_id,from_pile_id,from_card_id,from_time,from_reason,
+remark,status) values(#{bicycle_id},#{from_pile_id},#{from_card_id},#{from_time},#{from_reason},#{remark},#{status})
+</insert>
+<update id="updateBicycle_Deploy" statementType="PREPARED" parameterType="com.aowin.model.Bicycle_Deploy">
+
+update bicycle_deploy set to_pile_id=#{to_pile_id}, to_time=#{to_time},to_reason=#{to_reason},remark=#{remark}, status=#{status}
+where bicycle_id=#{bicycle_id} and to_time is  null
+</update>
+
+<select id="immigrateDeploy" resultType="com.aowin.model.Bicycle_Deploy" parameterType="com.aowin.model.Bicycle_Deploy">
+select * from bicycle_deploy 
+where bicycle_id=#{bicycle_id} and to_pile_id is null
+</select>
+</mapper>

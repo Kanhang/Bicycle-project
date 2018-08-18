@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+
+<mapper namespace="com.aowin.dao.Bicycle_DataMapper">
+<select id="singleRecharge" parameterType="com.aowin.model.Bicycle_Data" resultType="com.aowin.model.Bicycle_Data">
+select
+	(sum( card_record.chg_monthly_money)+sum( card_record.chg_wallet_money))total_recharge from card_record
+	where card_record.card_id=#{card_id} 
+</select>
+<select id="totalRecharge" parameterType="com.aowin.model.Bicycle_Data" resultType="com.aowin.model.Bicycle_Data">
+		select
+			(sum( card_record.chg_monthly_money)+sum( card_record.chg_wallet_money))total_recharge from card_record
+</select>
+<select id="countRent"  parameterType="com.aowin.model.Bicycle_Data" resultType="com.aowin.model.Bicycle_Data">
+select
+count(distinct card_id)rent_card from bicycle_record
+</select><!-- 遇到的问题distinct money是不对的因为相同的money就不会加  所以total——recharge total _spent 都不能用 distinct 但是balance 可以，因为一个id只有一个数据结果，
+所以必须把 total——spent 和 total——recharge 得 分开来写-->
+<select id="totalData" parameterType="com.aowin.model.Bicycle_Data" resultType="com.aowin.model.Bicycle_Data">
+	select
+	count (distinct card.card_code) total,
+	(sum(distinct card.monthly_money)+sum(distinct card.wallet_money))balance,
+	sum(distinct card.frozen_money)frozen_balance, 
+	 count(distinct bicycle_record.record_id)total_rent_count,
+	sum(distinct bicycle_record.money)total_spent,
+	sum(distinct round(to_number(to_date(bicycle_record.return_time,'yyyy-MM-dd HH24')-to_date(bicycle_record.rent_time,'yyyy-MM-dd HH24'))*24)+1)total_rent_hours
+	 from card 
+	 left join card_record on
+	 card.card_id=card_record.card_id
+	  left join bicycle_record on
+	  card.card_id=bicycle_record.card_id 
+	  where card.card_type!=4
+  
+</select>
+<select id="singleData" parameterType="com.aowin.model.Bicycle_Data" resultType="com.aowin.model.Bicycle_Data">
+select
+
+	(sum(distinct card.monthly_money)+sum(distinct card.wallet_money))balance,
+	sum(distinct card.frozen_money)frozen_balance, 
+	
+	sum( distinct bicycle_record.money)total_spent,
+	 count(distinct bicycle_record.record_id)total_rent_count,
+	sum(distinct round(to_number(to_date(bicycle_record.return_time,'yyyy-MM-dd HH24')-to_date(bicycle_record.rent_time,'yyyy-MM-dd HH24'))*24)+1)total_rent_hours
+	 from card 
+	 left join card_record on
+	 card.card_id=card_record.card_id
+	  left join bicycle_record on
+	  card.card_id=bicycle_record.card_id 
+	  where card.card_id=#{card_id}
+</select>
+<select id="singleDataMonth" parameterType="com.aowin.model.Bicycle_Data" resultType="com.aowin.model.Bicycle_Data">
+select <!-- 错误的需要更改 -->
+	(sum(card_record.chg_monthly_money)+sum(card_record.chg_wallet_money))total_recharge,
+	sum(distinct bicycle_record.money)total_spent,
+	 count(distinct bicycle_record.record_id)total_rent_count,
+	 	 avg(distinct bicycle_record.record_id)average_rent_count,
+	sum( round(to_number(to_date(bicycle_record.return_time,'yyyy-MM-dd HH24')-to_date(bicycle_record.rent_time,'yyyy-MM-dd HH24'))*24)+1)total_rent_hours,
+		avg( round(to_number(to_date(bicycle_record.return_time,'yyyy-MM-dd HH24')-to_date(bicycle_record.rent_time,'yyyy-MM-dd HH24'))*24)+1)average_rent_hours
+	 from card 
+	 left join card_record on
+	 card.card_id=card_record.card_id
+	  left join bicycle_record on
+	  card.card_id=bicycle_record.card_id 
+	  where card.card_id=#{card_id} and  =#{create_time}</select>
+<select id="singleDataYear"  parameterType="com.aowin.model.Bicycle_Data" resultType="com.aowin.model.Bicycle_Data"></select>
+
+<select id="totalDataMonth"  parameterType="com.aowin.model.Bicycle_Data" resultType="com.aowin.model.Bicycle_Data">
+		select
+			sum(distinct bicycle_record.money)total_spent,
+				 count(distinct bicycle_record.record_id)total_rent_count,
+	 	 avg(distinct bicycle_record.record_id)average_rent_count,
+	 	 	sum( round(to_number(to_date(bicycle_record.return_time,'yyyy-MM-dd HH24')-to_date(bicycle_record.rent_time,'yyyy-MM-dd HH24'))*24)+1)total_rent_hours,
+		avg( round(to_number(to_date(bicycle_record.return_time,'yyyy-MM-dd HH24')-to_date(bicycle_record.rent_time,'yyyy-MM-dd HH24'))*24)+1)average_rent_hours
+		
+from card
+left join card_record on
+	 card.card_id=card_record.card_id
+	  left join bicycle_record on
+	  card.card_id=bicycle_record.card_id 
+	  where sysdate=(to_date(bicycle_record.rent_time,'yyyy-MM'))
+</select>
+<select id="totalDataYear"  parameterType="com.aowin.model.Bicycle_Data" resultType="com.aowin.model.Bicycle_Data"></select>
+</mapper>

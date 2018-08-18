@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aowin.dao.Bicycle_StationMapper">
+<select id="selectCount" parameterType="java.util.Map" resultType="int">
+select 
+   count(*)
+   from Bicycle_Station
+   where  station_id  &gt;= 0
+
+   </select>
+   <select id="selectData" parameterType="java.util.Map" resultType="com.aowin.model.Bicycle_Station">
+   select * from 
+   (select station_id, station_code,station_name,bicycle_pile_num,person_in_charge,remark,rownum r
+   from  <!-- rownum 是oracle关键字必须取一个别名才可以使用，不然会报错 -->
+      bicycle_station
+       where 
+     station_id  &gt;= 0
+   
+       and rownum &lt;= #{endNo})t 
+      where t.r >= #{startNo}
+  </select> 
+
+</mapper>

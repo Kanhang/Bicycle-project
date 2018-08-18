@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aowin.dao.Card_Info_RecordMapper">
+	<insert id="insertCardRecord" parameterType="com.aowin.model.Card_Info_Record"
+		statementType="PREPARED">
+		insert into Card_Info_Record (card_id,info_type,create_time,user_id,remark)
+		values(#{card_id},#{info_type},#{create_time},#{user_id},#{remark})
+	</insert>
+	<select id="searchCardRecord" parameterType="com.aowin.model.Card_Info_Record"
+		resultType="com.aowin.model.Card_Info_Record">
+		select * from Card_Info_Record
+		where record_id=#{record_id}
+	</select>
+
+</mapper>

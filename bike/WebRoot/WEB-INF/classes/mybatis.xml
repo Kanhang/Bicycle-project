@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	<!-- 导入properties的资源文件 -->
+	<properties resource="jdbc.properties">
+	</properties>
+
+	<!-- 配置jdbc的连接环境 可以配置多个数据库的连接环境
+	default - 必须的属性 默认加载的环境 对应子标签environment的id属性值
+	-->
+	<environments default="oracle">
+		<environment id="oracle">
+			<!-- 设置事务处理管理器 -->
+			<transactionManager type="JDBC" />
+			<!-- 配置数据源 使用数据库连接池-->
+			<dataSource type="POOLED">
+				<!-- 配置数据源对象的属性  
+					property name属性对应datasource对象中的成员属性名 不是自定义的
+					
+					${变量名} 解析过程中会自动替换成资源文件中对应变量的具体的值
+				-->
+				<!-- 配置驱动 -->
+				<property name="driver" value="${driver_}" />
+				<!-- 配置数据库的连接路径 -->
+				<property name="url" value="${url_}" />
+				<!-- 配置数据库的用户名-->
+				<property name="username" value="${username_}" />
+				<!-- 配置数据库的密码 -->
+				<property name="password" value="${password_}" />
+				<property name="maxActive" value="${maxActive_}" />
+				<property name="minIdle" value="${minIdle_}"/>
+				<property name="maxIdle" value="${maxIdle_}"/>
+				<property name="maxWait" value="${maxWait_}"/>
+							</dataSource>
+		</environment>
+		
+		
+	</environments>
+	<!-- 导入mapper映射文件
+		映射文件:
+			映射的是接口和具体的实现sql
+	 -->
+	<mappers><!-- spring老师给的例子中没有 -->
+		<!-- 导入映射文件UserMapper.xml -->
+		<mapper resource="com/aowin/dao/CardMapper.xml"></mapper>
+		<mapper resource="com/aowin/dao/Card_RecordMapper.xml"></mapper>
+			<mapper resource="com/aowin/dao/Card_Info_RecordMapper.xml"></mapper>
+	</mappers>
+</configuration>

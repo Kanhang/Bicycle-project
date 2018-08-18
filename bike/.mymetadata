@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project-module
+  type="WEB"
+  name="bike"
+  id="myeclipse.1517277345443"
+  context-root="/bike"
+  j2ee-spec="5.0"
+  archive="bike.war">
+  <attributes>
+    <attribute name="webrootdir" value="WebRoot" />
+  </attributes>
+</project-module>
+

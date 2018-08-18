@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aowin.dao.Bicycle_InfoMapper">
+
+<update id="updateBicycle_Info" parameterType="com.aowin.model.Bicycle_Info" statementType="PREPARED">
+
+update bicycle_info set status=#{status}, pile_id=#{pile_id},remark=#{remark} where bicycle_code=#{bicycle_code}
+</update>
+<update id="immigrate" parameterType="com.aowin.model.Bicycle_Info"  statementType="PREPARED">
+
+update bicycle_info set status='5', remark='普通调入',pile_id=#{pile_id}where bicycle_id=#{bicycle_id}
+</update>
+<update id="emigrate" parameterType="com.aowin.model.Bicycle_Info" statementType="PREPARED">
+update bicycle_info set status='4', remark='普通调出',pile_id=null,card_id=#{card_id} where bicycle_id=#{bicycle_id}</update>
+<select id="selectCount" parameterType="java.util.Map" resultType="int">
+select 
+   count(*)
+   from bicycle_info
+   where  bicycle_id  &gt;= 0
+and remark='普通调出'
+   </select>
+   <select id="selectData" parameterType="java.util.Map" resultType="com.aowin.model.Bicycle_Info">
+   select * from 
+   (select  bicycle_id,bicycle_code,status,card_id, remark ,rownum r
+   from  <!-- rownum 是oracle关键字必须取一个别名才可以使用，不然会报错 -->
+      bicycle_info
+       where 
+   bicycle_id  &gt;= 0
+     and remark='普通调出'
+  
+       and rownum &lt;= #{endNo})t 
+      where t.r >= #{startNo}
+  </select> 
+</mapper>
